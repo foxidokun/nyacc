@@ -1,11 +1,11 @@
 #include <blocks/expression.h>
 
-class ValueExpression : public Expression {
+class VariableExpression : public Expression {
 public:
-  ValueExpression(int val): val_(val) {}
+  VariableExpression(std::string name): name_(std::move(name)) {}
 
   llvm::Value *codegen(CompilerContext& nyacc_context, llvm::LLVMContext& context, llvm::IRBuilder<>& builder) const override;
 
 private:
-  int val_;
+  std::string name_;
 };

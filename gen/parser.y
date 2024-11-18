@@ -8,12 +8,13 @@
 
   class CustLexer;
 
-  #include <blocks/assign.h>
+  #include <blocks/let.h>
   #include <blocks/binop.h>
   #include <blocks/expression.h>
   #include <blocks/return.h>
   #include <blocks/statement.h>
   #include <blocks/value.h>
+  #include <blocks/variable.h>
   #include <blocks/function.h>
   #include <blocks/program.h>
 }
@@ -59,7 +60,7 @@ func_impl: type IDENTIFIER LBRACE RBRACE LCURVBRACE statements RCURVBRACE {
 };
 
 statement: type IDENTIFIER ASSIGN expression SEMILICON {
-  $$ = std::make_unique<AssignStatement>(std::move($2), std::move($4));
+  $$ = std::make_unique<LetStatement>(std::move($2), std::move($4));
 } |
 RETURN expression SEMILICON {
   $$ = std::make_unique<ReturnStatement>(std::move($2));
@@ -89,6 +90,8 @@ functions: func_impl functions { $2->emplace_back(std::move($1)); $$ = std::move
 type: INTTYPE ;
 value: INTEGER {
   $$ = std::make_unique<ValueExpression>($1);
+} | IDENTIFIER {
+  $$ = std::make_unique<VariableExpression>(std::move($1));
 };
 
 %%

@@ -13,7 +13,7 @@ class Function {
 public:
   Function(std::string name, std::vector<std::unique_ptr<Statement>> content): name_(std::move(name)), content_(std::move(content)) {};
 
-  void codegen(llvm::LLVMContext& context, llvm::IRBuilder<>& builder) const {};
+  void codegen(CompilerContext& nyacc_context, llvm::LLVMContext& context, llvm::IRBuilder<>& builder, llvm::Module& module) const;
 
 private:
   std::string name_;
