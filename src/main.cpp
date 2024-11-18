@@ -1,9 +1,9 @@
-#include <FooLexer.h>
+#include <CustLexer.h>
 #include <parser.gen.h>
 
 int main()
 {
-  FooLexer lexer;
+  CustLexer lexer;
   yy::parser parser(lexer);
   return parser();
 }

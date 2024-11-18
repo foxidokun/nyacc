@@ -1,18 +1,15 @@
 %{
-    #include <FooLexer.h>
+    #include <CustLexer.h>
     #include <parser.gen.h>
-    
-    #undef  YY_DECL
-    #define YY_DECL int FooLexer::yylex(std::string *const yylval)
 %}
 
 %option c++ noyywrap
 
-%option yyclass="FooLexer"
+%option yyclass="CustLexer"
 
 %%
 
 [[:space:]] ;
-Hello { return yy::parser::token::HELLO; }
-[[:alpha:]]+ { *yylval = std::string(yytext, yytext + yyleng); return yy::parser::token::WORLD; }
+Hello { return yy::parser::make_HELLO(); }
+[[:alpha:]]+ { return yy::parser::make_WORLD("ABOBA"); }
 . { return yytext[0]; }

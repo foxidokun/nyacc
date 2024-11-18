@@ -3,21 +3,24 @@
 
 %code requires {
     #include <string>
-    #include <FooLexer.h>
+    class CustLexer;
 }
 
-%define api.value.type {std::string}
+%define api.value.type variant
+%define api.token.constructor
 
-%parse-param {FooLexer &lexer}
+%parse-param {CustLexer &lexer}
 
-%header
+%code top {
+    #include <CustLexer.h>
 
-%code {
-    #define yylex lexer.yylex
+    // #define yylex lexer.yylex
+
+    #define yylex(...) lexer.get_next_token()
 }
 
 %token HELLO
-%token WORLD
+%token <std::string> WORLD
 
 %%
 
