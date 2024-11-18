@@ -7,7 +7,7 @@ void Function::codegen(CompilerContext& nyacc_context, llvm::LLVMContext& contex
       llvm::FunctionType::get(llvm::Type::getInt64Ty(context), std::vector<llvm::Type *>(), false);
   
   auto *function =
-      llvm::Function::Create(function_type, llvm::Function::ExternalLinkage, "main", module);
+      llvm::Function::Create(function_type, llvm::Function::ExternalLinkage, name_, module);
   auto *entry_block = llvm::BasicBlock::Create(context, "entry", function);
   builder.SetInsertPoint(entry_block);
   
