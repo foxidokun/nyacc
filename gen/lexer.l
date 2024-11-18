@@ -28,8 +28,9 @@ int     [0-9]+
 ","       return yy::parser::make_COMMA();
 
 "int"     return yy::parser::make_INTTYPE();
+"return"  return yy::parser::make_RETURN();
 
-"="     return yy::parser::make_ASSIGN();
+"="       return yy::parser::make_ASSIGN();
 
 {int}     {
   errno = 0;

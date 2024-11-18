@@ -52,10 +52,14 @@
 
 // Program is multiple function implementations
 program: functions {
+  // Because they are added in reverse order
+  std::reverse($1->begin(), $1->end());
   prog = std::make_unique<Program>(std::move(*$1));
 };
 
 func_impl: type IDENTIFIER LBRACE RBRACE LCURVBRACE statements RCURVBRACE {
+  // Because they are added in reverse order
+  std::reverse($6->begin(), $6->end());
   $$ = std::make_unique<Function>(std::move($2), std::move(*$6));
 };
 

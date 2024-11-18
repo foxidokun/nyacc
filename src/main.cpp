@@ -1,3 +1,4 @@
+#include <context.h>
 #include <CustLexer.h>
 #include <fcntl.h>
 #include <fmt/base.h>
@@ -43,15 +44,9 @@ int main(int argc, char **argv) {
   // Create a new builder for the module.
   auto LLVMBuilder = llvm::IRBuilder<>(LLVMContext);
 
-  // auto *FT =
-  //     llvm::FunctionType::get(llvm::Type::getInt64Ty(LLVMContext), std::vector<llvm::Type *>(), false);
+  CompilerContext nyacc_context;
 
-  // auto *F =
-  //     llvm::Function::Create(FT, llvm::Function::ExternalLinkage, "main", LLVMModule);
-  // auto block = ast->codegen(LLVMContext, LLVMBuilder);
-  // auto *BB = llvm::BasicBlock::Create(LLVMContext, "entry", F);
-  // LLVMBuilder.SetInsertPoint(BB);
-  // LLVMBuilder.CreateRet(block);
+  prog->codegen(nyacc_context, LLVMContext, LLVMBuilder, LLVMModule);
 
   std::error_code ec;
   llvm::raw_fd_ostream out_file(argv[2], ec);
