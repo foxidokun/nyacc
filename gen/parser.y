@@ -14,12 +14,15 @@
   #include <blocks/return.h>
   #include <blocks/statement.h>
   #include <blocks/value.h>
+  #include <blocks/function.h>
+  #include <blocks/program.h>
 }
 
 %define api.value.type variant
 %define api.token.constructor
 
 %parse-param {CustLexer &lexer}
+%parse-param {std::unique_ptr<Program>& prog}
 
 %code top {
     #include <CustLexer.h>
@@ -35,6 +38,9 @@
 %nterm <std::unique_ptr<std::vector<std::unique_ptr<Statement>>>> statements
 %nterm <std::unique_ptr<Expression>> expression
 %nterm <std::unique_ptr<Expression>> value
+%nterm <std::unique_ptr<Function>> func_impl
+%nterm <std::unique_ptr<std::vector<std::unique_ptr<Function>>>> functions
+%nterm <std::unique_ptr<Program>> program
 
 %left PLUS MINUS 
 %left MUL DIV
@@ -44,12 +50,16 @@
 %%
 
 // Program is multiple function implementations
-program: func_impl program | %empty;
+program: functions {
+  prog = std::make_unique<Program>(std::move(*$1));
+};
 
-func_impl: type IDENTIFIER LBRACE RBRACE LCURVBRACE statements RCURVBRACE;
+func_impl: type IDENTIFIER LBRACE RBRACE LCURVBRACE statements RCURVBRACE {
+  $$ = std::make_unique<Function>(std::move($2), std::move(*$6));
+};
 
 statement: type IDENTIFIER ASSIGN expression SEMILICON {
-  $$ = std::make_unique<AssignStatement>($2, std::move($4));
+  $$ = std::make_unique<AssignStatement>(std::move($2), std::move($4));
 } |
 RETURN expression SEMILICON {
   $$ = std::make_unique<ReturnStatement>(std::move($2));
@@ -74,7 +84,8 @@ LBRACE expression RBRACE {
 ;
 
 // Вспомогательное
-statements: statement statements { $2->emplace_back(std::move($1)); $$ = std::move($2); } | statement {$$ = std::make_unique<std::vector<std::unique_ptr<Statement>>>();} ;
+statements: statement statements { $2->emplace_back(std::move($1)); $$ = std::move($2); } | statement {$$ = std::make_unique<std::vector<std::unique_ptr<Statement>>>(); $$->emplace_back(std::move($1)); } ;
+functions: func_impl functions { $2->emplace_back(std::move($1)); $$ = std::move($2); } | func_impl {$$ = std::make_unique<std::vector<std::unique_ptr<Function>>>(); $$->emplace_back(std::move($1)); };
 type: INTTYPE ;
 value: INTEGER {
   $$ = std::make_unique<ValueExpression>($1);
