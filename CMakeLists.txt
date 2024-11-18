@@ -13,6 +13,13 @@ FLEX_TARGET(lexer ${CMAKE_SOURCE_DIR}/gen/lexer.l ${CMAKE_CURRENT_BINARY_DIR}/le
 
 ADD_FLEX_BISON_DEPENDENCY(lexer parser)
 
+find_package(LLVM REQUIRED CONFIG)
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+
+include_directories(${LLVM_INCLUDE_DIRS})
+add_definitions(${LLVM_DEFINITIONS})
+
 include(FetchContent)
 
 # FetchContent_Declare(fmt
@@ -26,3 +33,4 @@ file(GLOB_RECURSE sources src/*.cpp src/*.h)
 add_executable(validator ${sources} ${BISON_parser_OUTPUTS} ${FLEX_lexer_OUTPUTS})
 target_include_directories(validator PUBLIC ${CMAKE_SOURCE_DIR}/inc)
 target_link_libraries(validator fmt)
+target_link_libraries(validator LLVM-18)
