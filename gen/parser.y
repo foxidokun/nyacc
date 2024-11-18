@@ -2,8 +2,11 @@
 %language "c++"
 
 %code requires {
-    #include <string>
-    class CustLexer;
+  #include <string>
+  class CustLexer;
+
+  class SumExpression;
+  class Expression;
 }
 
 %define api.value.type variant
@@ -13,18 +16,32 @@
 
 %code top {
     #include <CustLexer.h>
+    #include <expressions/sum.h>
+    #include <expressions/common.h>
 
     // #define yylex lexer.yylex
 
     #define yylex(...) lexer.get_next_token()
 }
 
-%token HELLO
-%token <std::string> WORLD
+%token MINUS
+%token PLUS
+%token <std::string> IDENTIFIER
+%token <int> INTEGER
+
+%parse-param {Expression *& ast}
+
+%nterm <SumExpression *> entrypoint
+
+%start entrypoint 
 
 %%
 
-hello_world: HELLO WORLD '!' { std::cout << "Goodbye " << $WORLD << '!' << std::endl; }
+entrypoint: INTEGER op INTEGER {
+  ast = new SumExpression($1, $3);
+}
+
+op: PLUS
 
 %%
 

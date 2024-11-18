@@ -23,7 +23,6 @@ include(FetchContent)
 
 file(GLOB_RECURSE sources src/*.cpp src/*.h)
 
-# Build fully static
 add_executable(validator ${sources} ${BISON_parser_OUTPUTS} ${FLEX_lexer_OUTPUTS})
 target_include_directories(validator PUBLIC ${CMAKE_SOURCE_DIR}/inc)
 target_link_libraries(validator fmt)
