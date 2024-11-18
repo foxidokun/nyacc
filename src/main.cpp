@@ -6,7 +6,7 @@
 #include <parser.gen.h>
 #include <llvm/IR/Module.h>
 
-#include <expressions/common.h>
+#include <blocks/expression.h>
 #include <sstream>
 #include <system_error>
 
@@ -18,15 +18,13 @@ Expression *get_ast(const char *filename) {
   lexer.switch_streams(&input_file, &parser_out);
 
   Expression *ast = nullptr;
-  yy::parser parser(lexer, ast);
+  yy::parser parser(lexer);
   parser();
 
   if (ast == nullptr) {
-    fmt::println("Failed to parse");
+    fmt::println(stderr, "Failed to parse");
     exit(1);
   }
-
-  fmt::println("PARSED {}", ast->format());
 
   return ast;
 }
