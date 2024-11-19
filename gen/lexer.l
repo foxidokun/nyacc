@@ -41,6 +41,8 @@ float   [0-9]+\.[0-9]+
 "f32"     return yy::parser::make_TYPE(ValType(ValType::Kind::Float, 32));
 "f64"     return yy::parser::make_TYPE(ValType(ValType::Kind::Float, 64));
 
+"void"    return yy::parser::make_TYPE(ValType(ValType::Kind::Void, 0));
+
 "return"  return yy::parser::make_RETURN();
 
 "="       return yy::parser::make_ASSIGN();

@@ -12,7 +12,8 @@ struct ValType {
   enum class Kind: uint8_t {
     Int,
     UInt,
-    Float
+    Float,
+    Void
   };
 
   Kind kind;

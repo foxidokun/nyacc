@@ -87,6 +87,9 @@ statement: TYPE IDENTIFIER ASSIGN expression SEMILICON {
 RETURN expression SEMILICON {
   $$ = std::make_unique<ReturnStatement>(std::move($2));
 } |
+RETURN SEMILICON {
+  $$ = std::make_unique<ReturnStatement>(nullptr);
+} |
 IDENTIFIER ASSIGN expression SEMILICON {
   $$ = std::make_unique<AssigStatement>(std::move($1), std::move($3));
 } |
@@ -125,7 +128,7 @@ value: INTEGER {
 };
 
 // Списки
-statements: statement statements { $2->emplace_back(std::move($1)); $$ = std::move($2); } | statement {$$ = std::make_unique<std::vector<std::unique_ptr<Statement>>>(); $$->emplace_back(std::move($1)); } ;
+statements: statement statements { $2->emplace_back(std::move($1)); $$ = std::move($2); } | %empty {$$ = std::make_unique<std::vector<std::unique_ptr<Statement>>>(); } ;
 functions:
   func_impl functions { $2->emplace_back(std::move($1)); $$ = std::move($2); } |
   func_def functions { $2->emplace_back(std::move($1)); $$ = std::move($2); } |
