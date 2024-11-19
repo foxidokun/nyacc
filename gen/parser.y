@@ -19,6 +19,8 @@
   #include <blocks/value.h>
   #include <blocks/str.h>
   #include <blocks/variable.h>
+  #include <blocks/loop.h>
+  #include <blocks/if.h>
   #include <blocks/function.h>
   #include <blocks/function_def.h>
   #include <blocks/program.h>
@@ -37,7 +39,7 @@
     #define yylex(...) lexer.get_next_token()
 }
 
-%token LBRACE RBRACE LCURVBRACE RCURVBRACE SEMILICON COMMA ASSIGN RETURN
+%token LBRACE RBRACE LCURVBRACE RCURVBRACE SEMILICON COMMA ASSIGN RETURN IF ELSE FOR WHILE
 %token <std::string> IDENTIFIER
 %token <std::string> STRCONST
 %token <int64_t> INTEGER
@@ -47,8 +49,10 @@
 // unique_ptr on vector just to be sure that copying is avoided
 
 %nterm <std::unique_ptr<Statement>> statement
+%nterm <std::unique_ptr<Statement>> non_semi_statement
 %nterm <std::unique_ptr<std::vector<std::unique_ptr<Statement>>>> statements
 %nterm <std::unique_ptr<Expression>> expression
+%nterm <std::unique_ptr<Expression>> expression_or_empty
 %nterm <std::unique_ptr<Expression>> value
 %nterm <std::unique_ptr<Statement>> func_impl
 %nterm <std::unique_ptr<Statement>> func_def
@@ -83,21 +87,41 @@ func_def: TYPE IDENTIFIER LBRACE args RBRACE SEMILICON {
   $$ = std::make_unique<FunctionDef>($1, std::move($2), std::move(*$4));
 };
 
-statement: TYPE IDENTIFIER ASSIGN expression SEMILICON {
+statement: non_semi_statement SEMILICON {
+  $$ = std::move($1);
+} |
+WHILE LBRACE expression RBRACE LCURVBRACE statements RCURVBRACE {
+  std::reverse($6->begin(), $6->end());
+  $$ = std::make_unique<LoopStatement>(nullptr, nullptr, std::move($3), std::move(*$6));
+} |
+FOR LBRACE non_semi_statement SEMILICON expression_or_empty SEMILICON non_semi_statement RBRACE LCURVBRACE statements RCURVBRACE {
+  std::reverse($10->begin(), $10->end());
+  $$ = std::make_unique<LoopStatement>(std::move($3), std::move($7), std::move($5), std::move(*$10));
+} | 
+IF LBRACE expression RBRACE LCURVBRACE statements RCURVBRACE {
+  std::reverse($6->begin(), $6->end());
+  $$ = std::make_unique<IfStatement>(std::move($3), std::move(*$6), std::vector<std::unique_ptr<Statement>>());
+} | 
+IF LBRACE expression RBRACE LCURVBRACE statements RCURVBRACE ELSE LCURVBRACE statements RCURVBRACE {
+  std::reverse($6->begin(),  $6->end());
+  std::reverse($10->begin(), $10->end());
+  $$ = std::make_unique<IfStatement>(std::move($3), std::move(*$6), std::move(*$10));
+};
+
+non_semi_statement: TYPE IDENTIFIER ASSIGN expression {
   $$ = std::make_unique<LetStatement>($1, std::move($2), std::move($4));
 } |
-RETURN expression SEMILICON {
+RETURN expression_or_empty {
   $$ = std::make_unique<ReturnStatement>(std::move($2));
 } |
-RETURN SEMILICON {
-  $$ = std::make_unique<ReturnStatement>(nullptr);
-} |
-IDENTIFIER ASSIGN expression SEMILICON {
+IDENTIFIER ASSIGN expression {
   $$ = std::make_unique<AssigStatement>(std::move($1), std::move($3));
 } |
-expression SEMILICON {
+expression_or_empty {
   $$ = std::make_unique<ExprStatement>(std::move($1));
 };
+
+expression_or_empty: expression { $$ = std::move($1); } | %empty {$$ = nullptr;}; 
 
 expression: value {$$ = std::move($1);} |
 expression PLUS expression {
