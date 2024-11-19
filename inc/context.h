@@ -1,5 +1,6 @@
 #pragma once
 
+#include <types.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Value.h>
 #include <string>
@@ -14,8 +15,8 @@ public:
   void enter_visibility_block();
   void exit_visibility_block();
 
-  llvm::Value *get_variable(const std::string& name) const;
-  void insert_variable(const std::string& name, llvm::Value * val);
+  TypedValue get_variable(const std::string& name) const;
+  void insert_variable(const std::string& name, TypedValue val);
 
 // Storage for llvm
 public:
@@ -25,5 +26,5 @@ llvm::Module& module;
 
 private:
   // Vector because of iterators
-  std::vector<std::unordered_map<std::string, llvm::Value *>> variables_; 
+  std::vector<std::unordered_map<std::string, TypedValue>> variables_; 
 };

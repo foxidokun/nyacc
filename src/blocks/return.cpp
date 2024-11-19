@@ -2,5 +2,5 @@
 
 void ReturnStatement::codegen(CompilerContext& context) const {
   auto retval = value_->codegen(context);
-  context.builder.CreateRet(retval);
+  context.builder.CreateRet(retval.val);
 }

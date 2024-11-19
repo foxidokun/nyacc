@@ -6,13 +6,14 @@ Curreent usage: `nyacc <input file> <output ir file>`
 
 Current possibilities: 
 ```
-int sum() {
+i64 sum() {
   return 2 + 3;
 }
 
-int main() {
-  int b = 6;
-  int a = 4 + b;
+i64 entry() {
+  f64 b = 6;
+  i32 x = 4;
+  i64 a = x + b;
   return a;
 }
 ```

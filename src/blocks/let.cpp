@@ -9,10 +9,12 @@ void LetStatement::codegen(CompilerContext &context) const {
   llvm::IRBuilder<> entry_builder(&(parentFunction->getEntryBlock()),
                                parentFunction->getEntryBlock().begin());
 
+  auto casted_val = cast(context, value, type_);
+
   auto variable = entry_builder.CreateAlloca(type_.llvm_type(context.llvm_context), nullptr, name_);
   // Assign
-  context.builder.CreateStore(value, variable);
+  context.builder.CreateStore(casted_val.val, variable);
 
   // Remeber
-  context.insert_variable(name_, variable);
+  context.insert_variable(name_, {variable, type_});
 }
