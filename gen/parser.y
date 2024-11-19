@@ -9,6 +9,7 @@
   class CustLexer;
 
   #include <blocks/let.h>
+  #include <blocks/assig.h>
   #include <blocks/binop.h>
   #include <blocks/expression.h>
   #include <blocks/return.h>
@@ -71,6 +72,9 @@ statement: TYPE IDENTIFIER ASSIGN expression SEMILICON {
 } |
 RETURN expression SEMILICON {
   $$ = std::make_unique<ReturnStatement>(std::move($2));
+} |
+IDENTIFIER ASSIGN expression SEMILICON {
+  $$ = std::make_unique<AssigStatement>(std::move($1), std::move($3));
 };
 
 expression: value {$$ = std::move($1);} |
