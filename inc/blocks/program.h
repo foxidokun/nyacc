@@ -1,6 +1,6 @@
 #pragma once
 
-#include "blocks/function.h"
+#include <blocks/statement.h>
 #include <llvm/IR/Value.h>
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/IRBuilder.h>
@@ -10,10 +10,10 @@
 
 class Program {
 public:
-  Program(std::vector<std::unique_ptr<Function>> content): content_(std::move(content)) {};
+  Program(std::vector<std::unique_ptr<Statement>> content): content_(std::move(content)) {};
 
   void codegen(CompilerContext& nyacc_context) const;
 
 private:
-  std::vector<std::unique_ptr<Function>> content_;
+  std::vector<std::unique_ptr<Statement>> content_;
 };

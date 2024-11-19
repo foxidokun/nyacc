@@ -12,11 +12,14 @@
   #include <blocks/assig.h>
   #include <blocks/binop.h>
   #include <blocks/expression.h>
+  #include <blocks/expr_statement.h>
+  #include <blocks/func_call.h>
   #include <blocks/return.h>
   #include <blocks/statement.h>
   #include <blocks/value.h>
   #include <blocks/variable.h>
   #include <blocks/function.h>
+  #include <blocks/function_def.h>
   #include <blocks/program.h>
   #include <types.h>
 }
@@ -45,10 +48,12 @@
 %nterm <std::unique_ptr<std::vector<std::unique_ptr<Statement>>>> statements
 %nterm <std::unique_ptr<Expression>> expression
 %nterm <std::unique_ptr<Expression>> value
-%nterm <std::unique_ptr<Function>> func_impl
-%nterm <std::unique_ptr<std::vector<std::unique_ptr<Function>>>> functions
+%nterm <std::unique_ptr<Statement>> func_impl
+%nterm <std::unique_ptr<Statement>> func_def
+%nterm <std::unique_ptr<std::vector<std::unique_ptr<Statement>>>> functions
 %nterm <std::unique_ptr<Program>> program
 %nterm <std::unique_ptr<std::vector<std::pair<ValType, std::string>>>> args
+%nterm <std::unique_ptr<std::vector<std::unique_ptr<Expression>>>> params
 
 %left PLUS MINUS 
 %left MUL DIV
@@ -67,7 +72,13 @@ program: functions {
 func_impl: TYPE IDENTIFIER LBRACE args RBRACE LCURVBRACE statements RCURVBRACE {
   // Because they are added in reverse order
   std::reverse($7->begin(), $7->end());
+  std::reverse($4->begin(), $4->end());
   $$ = std::make_unique<Function>($1, std::move($2), std::move(*$4), std::move(*$7));
+};
+
+func_def: TYPE IDENTIFIER LBRACE args RBRACE SEMILICON {
+  std::reverse($4->begin(), $4->end());
+  $$ = std::make_unique<FunctionDef>($1, std::move($2), std::move(*$4));
 };
 
 statement: TYPE IDENTIFIER ASSIGN expression SEMILICON {
@@ -78,6 +89,9 @@ RETURN expression SEMILICON {
 } |
 IDENTIFIER ASSIGN expression SEMILICON {
   $$ = std::make_unique<AssigStatement>(std::move($1), std::move($3));
+} |
+expression SEMILICON {
+  $$ = std::make_unique<ExprStatement>(std::move($1));
 };
 
 expression: value {$$ = std::move($1);} |
@@ -95,6 +109,10 @@ expression MUL expression {
 } |
 LBRACE expression RBRACE {
   $$ = std::move($2);
+} |
+IDENTIFIER LBRACE params RBRACE {
+  std::reverse($3->begin(), $3->end());
+  $$ = std::make_unique<FuncCallExpression>(std::move($1), std::move(*$3));
 }
 ;
 
@@ -108,11 +126,29 @@ value: INTEGER {
 
 // Списки
 statements: statement statements { $2->emplace_back(std::move($1)); $$ = std::move($2); } | statement {$$ = std::make_unique<std::vector<std::unique_ptr<Statement>>>(); $$->emplace_back(std::move($1)); } ;
-functions: func_impl functions { $2->emplace_back(std::move($1)); $$ = std::move($2); } | func_impl {$$ = std::make_unique<std::vector<std::unique_ptr<Function>>>(); $$->emplace_back(std::move($1)); };
-args: TYPE IDENTIFIER args {
-  $3->emplace_back($1, std::move($2));
+functions:
+  func_impl functions { $2->emplace_back(std::move($1)); $$ = std::move($2); } |
+  func_def functions { $2->emplace_back(std::move($1)); $$ = std::move($2); } |
+  %empty {$$ = std::make_unique<std::vector<std::unique_ptr<Statement>>>();};
+args: TYPE IDENTIFIER {
+  $$ = std::make_unique<std::vector<std::pair<ValType, std::string>>>();
+  $$->emplace_back($1, std::move($2));
+} |
+TYPE IDENTIFIER COMMA args {
+  $4->emplace_back($1, std::move($2));
+  $$ = std::move($4);
+}
+| %empty { $$ = std::make_unique<std::vector<std::pair<ValType, std::string>>>(); };
+
+params: expression COMMA params {
   $$ = std::move($3);
-} | %empty { $$ = std::make_unique<std::vector<std::pair<ValType, std::string>>>(); };
+  $$->push_back(std::move($1));
+} | expression {
+  $$ = std::make_unique<std::vector<std::unique_ptr<Expression>>>();
+  $$->push_back(std::move($1));
+} | %empty {
+  $$ = std::make_unique<std::vector<std::unique_ptr<Expression>>>();
+};
 
 %%
 
