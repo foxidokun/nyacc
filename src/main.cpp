@@ -39,9 +39,7 @@ int main(int argc, char **argv) {
   std::unique_ptr<Program> prog = get_ast(argv[1]);
 
   auto LLVMContext = llvm::LLVMContext();
-  auto LLVMModule = llvm::Module("jit", LLVMContext);
-
-  // Create a new builder for the module.
+  auto LLVMModule = llvm::Module("nyacc", LLVMContext);
   auto LLVMBuilder = llvm::IRBuilder<>(LLVMContext);
 
   CompilerContext nyacc_context(LLVMContext, LLVMBuilder, LLVMModule);
