@@ -42,6 +42,8 @@ float   [0-9]+\.[0-9]+
 "f64"     return yy::parser::make_TYPE(ValType(ValType::Kind::Float, 64));
 
 "void"    return yy::parser::make_TYPE(ValType(ValType::Kind::Void, 0));
+"str"     return yy::parser::make_TYPE(ValType(ValType::Kind::String, 0));
+\".*\"    return yy::parser::make_STRCONST(std::string(yytext + 1, yytext + yyleng - 1));
 
 "return"  return yy::parser::make_RETURN();
 

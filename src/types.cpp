@@ -20,6 +20,8 @@ llvm::Type *ValType::llvm_type(llvm::LLVMContext& context) const {
       }
     case Kind::Void:
       return llvm::Type::getVoidTy(context);
+    case Kind::String:
+      return llvm::Type::getInt8Ty(context)->getPointerTo();
   }
 
   fmt::println("Unexpected type");
@@ -37,6 +39,11 @@ TypedValue cast(CompilerContext& context, TypedValue val, ValType target_type) {
   // Sanity check
   if (target_type.kind == ValType::Kind::Void || val.type.kind == ValType::Kind::Void) {
     fmt::println(stderr, "Can't cast to/from void");
+    exit(1);
+  }
+
+  if (target_type.kind == ValType::Kind::String || val.type.kind == ValType::Kind::String) {
+    fmt::println(stderr, "Can't cast to/from string");
     exit(1);
   }
 

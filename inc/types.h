@@ -13,7 +13,8 @@ struct ValType {
     Int,
     UInt,
     Float,
-    Void
+    Void,
+    String
   };
 
   Kind kind;

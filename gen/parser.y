@@ -17,6 +17,7 @@
   #include <blocks/return.h>
   #include <blocks/statement.h>
   #include <blocks/value.h>
+  #include <blocks/str.h>
   #include <blocks/variable.h>
   #include <blocks/function.h>
   #include <blocks/function_def.h>
@@ -38,6 +39,7 @@
 
 %token LBRACE RBRACE LCURVBRACE RCURVBRACE SEMILICON COMMA ASSIGN RETURN
 %token <std::string> IDENTIFIER
+%token <std::string> STRCONST
 %token <int64_t> INTEGER
 %token <double> DOUBLE
 %token <ValType> TYPE
@@ -125,6 +127,8 @@ value: INTEGER {
   $$ = std::make_unique<ValueExpression>($1);
 } | IDENTIFIER {
   $$ = std::make_unique<VariableExpression>(std::move($1));
+} | STRCONST {
+  $$ = std::make_unique<StrExpression>(std::move($1));
 };
 
 // Списки

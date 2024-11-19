@@ -57,6 +57,11 @@ TypedValue BinopExpression::codegen(CompilerContext& context) const {
 }
 
 static ValType get_result_type(ValType lhs, ValType rhs) {
+  if (lhs.kind == ValType::Kind::Void || lhs.kind == ValType::Kind::String || rhs.kind == ValType::Kind::Void || rhs.kind == ValType::Kind::String) {
+    fmt::println(stderr, "Unsupported binop on void / string objects");
+    exit(1);
+  }
+
   // Both float 
   if (lhs.kind == ValType::Kind::Float && rhs.kind == ValType::Kind::Float) {
     return {ValType::Kind::Float, std::max(lhs.bitwidth, rhs.bitwidth)};
