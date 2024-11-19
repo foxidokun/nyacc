@@ -46,6 +46,10 @@ float   [0-9]+\.[0-9]+
 \".*\"    return yy::parser::make_STRCONST(std::string(yytext + 1, yytext + yyleng - 1));
 
 "return"  return yy::parser::make_RETURN();
+"if"      return yy::parser::make_IF();
+"else"    return yy::parser::make_ELSE();
+"for"     return yy::parser::make_FOR();
+"while"   return yy::parser::make_WHILE();
 
 "="       return yy::parser::make_ASSIGN();
 
