@@ -39,6 +39,8 @@
 %token <double> DOUBLE
 %token <ValType> TYPE
 
+// unique_ptr on vector just to be sure that copying is avoided
+
 %nterm <std::unique_ptr<Statement>> statement
 %nterm <std::unique_ptr<std::vector<std::unique_ptr<Statement>>>> statements
 %nterm <std::unique_ptr<Expression>> expression
@@ -46,6 +48,7 @@
 %nterm <std::unique_ptr<Function>> func_impl
 %nterm <std::unique_ptr<std::vector<std::unique_ptr<Function>>>> functions
 %nterm <std::unique_ptr<Program>> program
+%nterm <std::unique_ptr<std::vector<std::pair<ValType, std::string>>>> args
 
 %left PLUS MINUS 
 %left MUL DIV
@@ -61,10 +64,10 @@ program: functions {
   prog = std::make_unique<Program>(std::move(*$1));
 };
 
-func_impl: TYPE IDENTIFIER LBRACE RBRACE LCURVBRACE statements RCURVBRACE {
+func_impl: TYPE IDENTIFIER LBRACE args RBRACE LCURVBRACE statements RCURVBRACE {
   // Because they are added in reverse order
-  std::reverse($6->begin(), $6->end());
-  $$ = std::make_unique<Function>($1, std::move($2), std::move(*$6));
+  std::reverse($7->begin(), $7->end());
+  $$ = std::make_unique<Function>($1, std::move($2), std::move(*$4), std::move(*$7));
 };
 
 statement: TYPE IDENTIFIER ASSIGN expression SEMILICON {
@@ -95,9 +98,6 @@ LBRACE expression RBRACE {
 }
 ;
 
-// Вспомогательное
-statements: statement statements { $2->emplace_back(std::move($1)); $$ = std::move($2); } | statement {$$ = std::make_unique<std::vector<std::unique_ptr<Statement>>>(); $$->emplace_back(std::move($1)); } ;
-functions: func_impl functions { $2->emplace_back(std::move($1)); $$ = std::move($2); } | func_impl {$$ = std::make_unique<std::vector<std::unique_ptr<Function>>>(); $$->emplace_back(std::move($1)); };
 value: INTEGER {
   $$ = std::make_unique<ValueExpression>($1);
 } | DOUBLE {
@@ -105,6 +105,14 @@ value: INTEGER {
 } | IDENTIFIER {
   $$ = std::make_unique<VariableExpression>(std::move($1));
 };
+
+// Списки
+statements: statement statements { $2->emplace_back(std::move($1)); $$ = std::move($2); } | statement {$$ = std::make_unique<std::vector<std::unique_ptr<Statement>>>(); $$->emplace_back(std::move($1)); } ;
+functions: func_impl functions { $2->emplace_back(std::move($1)); $$ = std::move($2); } | func_impl {$$ = std::make_unique<std::vector<std::unique_ptr<Function>>>(); $$->emplace_back(std::move($1)); };
+args: TYPE IDENTIFIER args {
+  $3->emplace_back($1, std::move($2));
+  $$ = std::move($3);
+} | %empty { $$ = std::make_unique<std::vector<std::pair<ValType, std::string>>>(); };
 
 %%
 
