@@ -19,6 +19,15 @@ float   [0-9]+\.[0-9]+
 "*"       return yy::parser::make_MUL();
 "/"       return yy::parser::make_DIV();
 
+">"       return yy::parser::make_COMP(OpSign::GT);
+"<"       return yy::parser::make_COMP(OpSign::LT);
+">="      return yy::parser::make_COMP(OpSign::GE);
+"<="      return yy::parser::make_COMP(OpSign::LE);
+"=="      return yy::parser::make_COMP(OpSign::EQ);
+"!="      return yy::parser::make_COMP(OpSign::NE);
+
+"!"       return yy::parser::make_NOT();
+
 "("       return yy::parser::make_LBRACE();
 ")"       return yy::parser::make_RBRACE();
 

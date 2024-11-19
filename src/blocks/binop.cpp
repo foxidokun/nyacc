@@ -11,6 +11,16 @@
 
 static ValType get_result_type(ValType lhs, ValType rhs);
 
+#define DISPATCH_CASE(op, float_func, int_func, uint_funt, restype) \
+case OpSign::op:  \
+  if (result_type.kind == ValType::Kind::Float) { \
+    return {context.builder.float_func(lhs.val, rhs.val), restype}; \
+  } else if (result_type.kind == ValType::Kind::Int) {  \
+    return {context.builder.int_func(lhs.val, rhs.val), restype}; \
+  } else { /*Uint*/  \
+    return {context.builder.uint_funt(lhs.val, rhs.val), restype};  \
+  }
+
 TypedValue BinopExpression::codegen(CompilerContext& context) const {
   auto lhs = lhs_->codegen(context);
   auto rhs = rhs_->codegen(context);
@@ -24,35 +34,22 @@ TypedValue BinopExpression::codegen(CompilerContext& context) const {
 
   // Create operations
 
+  auto cmp_result_type = ValType{ValType::Kind::Int, 1};
+
   switch (type_) {
-    case OpSign::Minus: 
-      if (result_type.kind == ValType::Kind::Float) {
-        return {context.builder.CreateFSub(lhs.val, rhs.val), result_type};
-      } else {
-        return {context.builder.CreateSub(lhs.val, rhs.val), result_type};
-      }
-    case OpSign::Plus:
-      if (result_type.kind == ValType::Kind::Float) {
-        return {context.builder.CreateFAdd(lhs.val, rhs.val), result_type};
-      } else {
-        return {context.builder.CreateAdd(lhs.val, rhs.val), result_type};
-      }
-    case OpSign::Mul: 
-      if (result_type.kind == ValType::Kind::Float) {
-        return {context.builder.CreateFMul(lhs.val, rhs.val), result_type};
-      } else {
-        return {context.builder.CreateMul(lhs.val, rhs.val), result_type};
-      }
-    case OpSign::Div: 
-      if (result_type.kind == ValType::Kind::Float) {
-        return {context.builder.CreateFDiv(lhs.val, rhs.val), result_type};
-      } else if (result_type.kind == ValType::Kind::Int) {
-        return {context.builder.CreateSDiv(lhs.val, rhs.val), result_type};
-      } else { // UInt
-        return {context.builder.CreateUDiv(lhs.val, rhs.val), result_type};
-      }
-    default:
-      exit(1);
+    DISPATCH_CASE(Minus, CreateFSub, CreateSub, CreateSub, result_type)
+    DISPATCH_CASE(Plus, CreateFAdd, CreateAdd, CreateAdd, result_type)
+    DISPATCH_CASE(Mul, CreateFMul, CreateMul, CreateMul, result_type)
+    DISPATCH_CASE(Div, CreateFDiv, CreateSDiv, CreateUDiv, result_type)
+    DISPATCH_CASE(LT, CreateFCmpOLT, CreateICmpSLT, CreateICmpULT, cmp_result_type)
+    DISPATCH_CASE(LE, CreateFCmpOLE, CreateICmpSLE, CreateICmpULE, cmp_result_type)
+    DISPATCH_CASE(GT, CreateFCmpOGT, CreateICmpSGT, CreateICmpUGT, cmp_result_type)
+    DISPATCH_CASE(GE, CreateFCmpOGE, CreateICmpSGE, CreateICmpUGE, cmp_result_type)
+    DISPATCH_CASE(EQ, CreateFCmpOEQ, CreateICmpEQ, CreateICmpEQ, cmp_result_type)
+    DISPATCH_CASE(NE, CreateFCmpONE, CreateICmpNE, CreateICmpNE, cmp_result_type)
+    default: 
+    fmt::println(stderr, "Unexpected binop");
+    exit(1);
   }
 }
 

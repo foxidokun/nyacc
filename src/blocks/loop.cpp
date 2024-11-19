@@ -1,4 +1,5 @@
-#include "types.h"
+#include <blocks/common.h>
+#include <types.h>
 #include <blocks/loop.h>
 #include <llvm/ADT/APInt.h>
 #include <llvm/IR/BasicBlock.h>
@@ -17,12 +18,8 @@ void LoopStatement::codegen(CompilerContext &context) const {
   context.builder.CreateBr(check_block);
   context.builder.SetInsertPoint(check_block);
   
-  auto any_cond_val = condition_->codegen(context);
-  auto cond_val = cast(context, any_cond_val, ValType{ValType::Kind::Int, 64});
-
-  auto zero = llvm::ConstantInt::get(cond_val.type.llvm_type(context.llvm_context), llvm::APInt(64, 0));
-  auto condition = context.builder.CreateICmpNE(cond_val.val, zero);
-  context.builder.CreateCondBr(condition, loop_block, cont_block);
+  auto condition = boolify(context, condition_->codegen(context));
+  context.builder.CreateCondBr(condition.val, loop_block, cont_block);
 
   // Emit loop content 
   context.builder.SetInsertPoint(loop_block);
