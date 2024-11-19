@@ -6,6 +6,7 @@
 struct ValType {
   enum class Kind {
     Int,
+    UInt,
     Float
   };
 

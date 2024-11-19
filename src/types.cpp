@@ -7,6 +7,7 @@
 llvm::Type *ValType::llvm_type(llvm::LLVMContext& context) const {
   switch (kind) {
     case Kind::Int:
+    case Kind::UInt:
       return llvm::Type::getIntNTy(context, bitwidth);
     case Kind::Float:
       switch (bitwidth) {
