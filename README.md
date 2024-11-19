@@ -10,10 +10,11 @@ i64 sum() {
   return 2 + 3;
 }
 
-i64 entry() {
+f64 entry() {
   f64 b = 6;
   i32 x = 4;
   i64 a = x + b;
-  return a;
+  f64 res = a + 9.5;
+  return res;
 }
 ```
