@@ -7,7 +7,7 @@
 class ReturnStatement: public Statement {
 public:
   ReturnStatement(std::unique_ptr<Expression> value): value_(std::move(value)) {}
-  virtual void codegen(CompilerContext& nyacc_context, llvm::LLVMContext& context, llvm::IRBuilder<>& builder) const override;
+  virtual void codegen(CompilerContext& nyacc_context) const override;
 
 private:
   std::unique_ptr<Expression> value_;

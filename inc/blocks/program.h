@@ -12,7 +12,7 @@ class Program {
 public:
   Program(std::vector<std::unique_ptr<Function>> content): content_(std::move(content)) {};
 
-  void codegen(CompilerContext& nyacc_context, llvm::LLVMContext& context, llvm::IRBuilder<>& builder, llvm::Module& module) const;
+  void codegen(CompilerContext& nyacc_context) const;
 
 private:
   std::vector<std::unique_ptr<Function>> content_;

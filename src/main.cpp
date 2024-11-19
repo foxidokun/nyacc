@@ -2,13 +2,13 @@
 #include <CustLexer.h>
 #include <fcntl.h>
 #include <fmt/base.h>
+#include <fmt/printf.h>
 #include <fstream>
 #include <llvm/Support/raw_ostream.h>
-#include <memory>
 #include <parser.gen.h>
 #include <llvm/IR/Module.h>
 
-#include <blocks/expression.h>
+#include <blocks/program.h>
 #include <sstream>
 #include <system_error>
 
@@ -39,14 +39,12 @@ int main(int argc, char **argv) {
   std::unique_ptr<Program> prog = get_ast(argv[1]);
 
   auto LLVMContext = llvm::LLVMContext();
-  auto LLVMModule = llvm::Module("jit", LLVMContext);
-
-  // Create a new builder for the module.
+  auto LLVMModule = llvm::Module("nyacc", LLVMContext);
   auto LLVMBuilder = llvm::IRBuilder<>(LLVMContext);
 
-  CompilerContext nyacc_context;
+  CompilerContext nyacc_context(LLVMContext, LLVMBuilder, LLVMModule);
 
-  prog->codegen(nyacc_context, LLVMContext, LLVMBuilder, LLVMModule);
+  prog->codegen(nyacc_context);
 
   std::error_code ec;
   llvm::raw_fd_ostream out_file(argv[2], ec);

@@ -10,6 +10,7 @@
 
 id      [a-zA-Z][a-zA-Z_0-9]*
 int     [0-9]+
+float   [0-9]+\.[0-9]+
 
 %%
 
@@ -27,18 +28,39 @@ int     [0-9]+
 ";"       return yy::parser::make_SEMILICON();
 ","       return yy::parser::make_COMMA();
 
-"int"     return yy::parser::make_INTTYPE();
+"i8"      return yy::parser::make_TYPE(ValType(ValType::Kind::Int, 8));
+"i16"     return yy::parser::make_TYPE(ValType(ValType::Kind::Int, 16));
+"i32"     return yy::parser::make_TYPE(ValType(ValType::Kind::Int, 32));
+"i64"     return yy::parser::make_TYPE(ValType(ValType::Kind::Int, 64));
+
+"u8"      return yy::parser::make_TYPE(ValType(ValType::Kind::UInt, 8));
+"u16"     return yy::parser::make_TYPE(ValType(ValType::Kind::UInt, 16));
+"u32"     return yy::parser::make_TYPE(ValType(ValType::Kind::UInt, 32));
+"u64"     return yy::parser::make_TYPE(ValType(ValType::Kind::UInt, 64));
+
+"f32"     return yy::parser::make_TYPE(ValType(ValType::Kind::Float, 32));
+"f64"     return yy::parser::make_TYPE(ValType(ValType::Kind::Float, 64));
+
 "return"  return yy::parser::make_RETURN();
 
 "="       return yy::parser::make_ASSIGN();
 
 {int}     {
   errno = 0;
-  long n = strtol(yytext, NULL, 10);
-  if (! (INT_MIN <= n && n <= INT_MAX && errno != ERANGE)) {
+  long n = strtoll(yytext, NULL, 10);
+  if (errno == ERANGE) {
     throw yy::parser::syntax_error(std::string("integer is out of range: ") + yytext);
   }
-  return yy::parser::make_INTEGER((int) n);
+  return yy::parser::make_INTEGER(n);
+}
+
+{float} {
+  errno = 0;
+  double n = strtod(yytext, NULL);
+  if (errno == ERANGE) {
+    throw yy::parser::syntax_error(std::string("double is out of range: ") + yytext);
+  }
+  return yy::parser::make_DOUBLE(n);
 }
 
 {id} return yy::parser::make_IDENTIFIER(std::string(yytext, yytext + yyleng));

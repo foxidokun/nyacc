@@ -17,6 +17,7 @@
   #include <blocks/variable.h>
   #include <blocks/function.h>
   #include <blocks/program.h>
+  #include <types.h>
 }
 
 %define api.value.type variant
@@ -31,9 +32,11 @@
     #define yylex(...) lexer.get_next_token()
 }
 
-%token LBRACE RBRACE LCURVBRACE RCURVBRACE SEMILICON INTTYPE COMMA ASSIGN RETURN
+%token LBRACE RBRACE LCURVBRACE RCURVBRACE SEMILICON COMMA ASSIGN RETURN
 %token <std::string> IDENTIFIER
-%token <int> INTEGER
+%token <int64_t> INTEGER
+%token <double> DOUBLE
+%token <ValType> TYPE
 
 %nterm <std::unique_ptr<Statement>> statement
 %nterm <std::unique_ptr<std::vector<std::unique_ptr<Statement>>>> statements
@@ -57,14 +60,14 @@ program: functions {
   prog = std::make_unique<Program>(std::move(*$1));
 };
 
-func_impl: type IDENTIFIER LBRACE RBRACE LCURVBRACE statements RCURVBRACE {
+func_impl: TYPE IDENTIFIER LBRACE RBRACE LCURVBRACE statements RCURVBRACE {
   // Because they are added in reverse order
   std::reverse($6->begin(), $6->end());
-  $$ = std::make_unique<Function>(std::move($2), std::move(*$6));
+  $$ = std::make_unique<Function>($1, std::move($2), std::move(*$6));
 };
 
-statement: type IDENTIFIER ASSIGN expression SEMILICON {
-  $$ = std::make_unique<LetStatement>(std::move($2), std::move($4));
+statement: TYPE IDENTIFIER ASSIGN expression SEMILICON {
+  $$ = std::make_unique<LetStatement>($1, std::move($2), std::move($4));
 } |
 RETURN expression SEMILICON {
   $$ = std::make_unique<ReturnStatement>(std::move($2));
@@ -91,8 +94,9 @@ LBRACE expression RBRACE {
 // Вспомогательное
 statements: statement statements { $2->emplace_back(std::move($1)); $$ = std::move($2); } | statement {$$ = std::make_unique<std::vector<std::unique_ptr<Statement>>>(); $$->emplace_back(std::move($1)); } ;
 functions: func_impl functions { $2->emplace_back(std::move($1)); $$ = std::move($2); } | func_impl {$$ = std::make_unique<std::vector<std::unique_ptr<Function>>>(); $$->emplace_back(std::move($1)); };
-type: INTTYPE ;
 value: INTEGER {
+  $$ = std::make_unique<ValueExpression>($1);
+} | DOUBLE {
   $$ = std::make_unique<ValueExpression>($1);
 } | IDENTIFIER {
   $$ = std::make_unique<VariableExpression>(std::move($1));

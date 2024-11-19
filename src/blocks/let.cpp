@@ -1,11 +1,20 @@
 #include <blocks/let.h>
 
-void LetStatement::codegen(CompilerContext& nyacc_context, llvm::LLVMContext& context, llvm::IRBuilder<>& builder) const {
-  auto value = value_->codegen(nyacc_context, context, builder);
-  auto variable = builder.CreateAlloca(llvm::Type::getInt64Ty(context), nullptr, name_);
+void LetStatement::codegen(CompilerContext &context) const {
+  auto value = value_->codegen(context);
+
+  // Create alloca in the entry block of function
+  auto *parentFunction = context.builder.GetInsertBlock()->getParent();
+  // create temp builder to point to start of function
+  llvm::IRBuilder<> entry_builder(&(parentFunction->getEntryBlock()),
+                               parentFunction->getEntryBlock().begin());
+
+  auto casted_val = cast(context, value, type_);
+
+  auto variable = entry_builder.CreateAlloca(type_.llvm_type(context.llvm_context), nullptr, name_);
   // Assign
-  builder.CreateStore(value, variable);
+  context.builder.CreateStore(casted_val.val, variable);
 
   // Remeber
-  nyacc_context.insert_variable(name_, variable);
+  context.insert_variable(name_, {variable, type_});
 }
