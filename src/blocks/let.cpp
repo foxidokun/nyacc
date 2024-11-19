@@ -9,8 +9,7 @@ void LetStatement::codegen(CompilerContext &context) const {
   llvm::IRBuilder<> entry_builder(&(parentFunction->getEntryBlock()),
                                parentFunction->getEntryBlock().begin());
 
-  auto variable = entry_builder.CreateAlloca(
-      llvm::Type::getInt64Ty(context.llvm_context), nullptr, name_);
+  auto variable = entry_builder.CreateAlloca(type_.llvm_type(context.llvm_context), nullptr, name_);
   // Assign
   context.builder.CreateStore(value, variable);
 
