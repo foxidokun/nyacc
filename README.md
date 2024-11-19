@@ -1,40 +1,38 @@
 nuacc is `nya`-fied C-like lang compiler for formal lang course. Yes, we are cooked 
 
-**Under delopment right now**
+**Under development right now**
 
-Curreent usage: `nyacc <input file> <output ir file>`
+### Current usage (will be simplified)
+1. Build, you need llvm-18 and libfmt
+2. Translate into IR with `nyacc <input file> <output ir file>`
+3. Then compile with `clang++ <out ir file> libnyacclib.a -lfmt`
 
-Current possibilities: 
+### Current possibilities
 ```
-f64 entry(i64 shift);
+str in_s();
+void println_s(str x);
+str concat(str a, str b);
+str format_i(str fmt, i64 v);
 
-void out(str val);
-
-void fun() {
-  return;
+str format_line(i32 idx, str line) {
+  str predicate = format_i("Idx {}: ", idx);
+  return concat(predicate, line);
 }
 
-i64 sum(f64 x, f64 y) {
-  return x + y;
+i64 main() {
+  str hello = "Hello";
+  hello = concat(hello, " ");
+  str name = in_s();
+
+  str outw = concat(concat(hello, name), "!");
+
+  for (i32 i = 0; !(i >= 10); i = i + 1) {
+    println_s(format_line(i + 1, outw));
+  }
+
+  return 0;
 }
 
-f64 entry(i64 shift) {
-  str xxx = "xxx";
-  f64 b = 6;
-  i32 x = 4;
-  i64 a = x + b;
-  f64 res = a + 9.5;
-  i64 temp = 2;
-  res = res + sum(2, temp);
-  out(xxx);
-  out("AYAYA");
-  return res + shift;
-}
 ```
 
-where `out` is from c++ file
-```
-extern "C" void out(const char* str) {
-  fmt::println("OUT: {}", str);
-}
-```
+where top definitions is from nyacc's stdlib (it has way more functions)
