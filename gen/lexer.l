@@ -32,10 +32,14 @@ int     [0-9]+
 "i32"     return yy::parser::make_TYPE(ValType(ValType::Kind::Int, 32));
 "i64"     return yy::parser::make_TYPE(ValType(ValType::Kind::Int, 64));
 
+%{
+/*
 "u8"      return yy::parser::make_TYPE(ValType(ValType::Kind::UInt, 8));
 "u16"     return yy::parser::make_TYPE(ValType(ValType::Kind::UInt, 16));
 "u32"     return yy::parser::make_TYPE(ValType(ValType::Kind::UInt, 32));
 "u64"     return yy::parser::make_TYPE(ValType(ValType::Kind::UInt, 64));
+*/
+%}
 
 "f32"     return yy::parser::make_TYPE(ValType(ValType::Kind::Float, 32));
 "f64"     return yy::parser::make_TYPE(ValType(ValType::Kind::Float, 64));
