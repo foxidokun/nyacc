@@ -9,5 +9,5 @@
 class Expression {
 public:
   virtual ~Expression() = default;
-  virtual llvm::Value* codegen(CompilerContext& nyacc_context, llvm::LLVMContext& context, llvm::IRBuilder<>& builder) const = 0;
+  virtual llvm::Value* codegen(CompilerContext& nyacc_context) const = 0;
 };

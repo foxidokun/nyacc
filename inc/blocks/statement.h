@@ -9,5 +9,5 @@
 class Statement {
 public:
   virtual ~Statement() = default;
-  virtual void codegen(CompilerContext& nyacc_context, llvm::LLVMContext& context, llvm::IRBuilder<>& builder) const = 0;
+  virtual void codegen(CompilerContext& nyacc_context) const = 0;
 };

@@ -4,15 +4,15 @@
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/Value.h>
 
-llvm::Value *BinopExpression::codegen(CompilerContext& nyacc_context, llvm::LLVMContext& context, llvm::IRBuilder<>& builder) const {
-  auto lhs = lhs_->codegen(nyacc_context, context, builder);
-  auto rhs = rhs_->codegen(nyacc_context, context, builder);
+llvm::Value *BinopExpression::codegen(CompilerContext& context) const {
+  auto lhs = lhs_->codegen(context);
+  auto rhs = rhs_->codegen(context);
 
   switch (type_) {
-    case OpSign::Minus: return builder.CreateSub(lhs,rhs);
-    case OpSign::Plus: return builder.CreateAdd(lhs,rhs);
-    case OpSign::Mul: return builder.CreateMul(lhs,rhs);
-    case OpSign::Div: return builder.CreateSDiv(lhs,rhs); // Signed div
+    case OpSign::Minus: return context.builder.CreateSub(lhs,rhs);
+    case OpSign::Plus: return context.builder.CreateAdd(lhs,rhs);
+    case OpSign::Mul: return context.builder.CreateMul(lhs,rhs);
+    case OpSign::Div: return context.builder.CreateSDiv(lhs,rhs); // Signed div
     default:
       exit(1);
   }
