@@ -8,6 +8,8 @@
 #include <vector>
 
 class CompilerContext {
+  using FuncType = std::pair<ValType, std::vector<ValType>>;
+
 public:
   CompilerContext(llvm::LLVMContext& _llvm_context, llvm::IRBuilder<>& _builder, llvm::Module& _module):
   llvm_context(_llvm_context), builder(_builder), module(_module) {}
@@ -18,8 +20,12 @@ public:
   TypedValue get_variable(const std::string& name) const;
   void insert_variable(const std::string& name, TypedValue val);
 
-  std::optional<ValType> get_func_ret(const std::string& name) const;
-  void set_func_ret(const std::string& name, ValType type);
+  // shared_ptr because no std::optional<T&> until c++26 :cry:
+  std::shared_ptr<FuncType> get_function_type(const std::string& name) const;
+  void set_function_type(const std::string& name, FuncType type);
+
+  const std::string& current_function() const;
+  void enter_function(std::string name);
 
 // Storage for llvm
 public:
@@ -30,5 +36,6 @@ llvm::Module& module;
 private:
   // Vector because of iterators
   std::vector<std::unordered_map<std::string, TypedValue>> variables_; 
-  std::unordered_map<std::string, ValType> func_rets_;
+  std::unordered_map<std::string, std::shared_ptr<FuncType>> functions_;
+  std::string current_function_;
 };

@@ -8,7 +8,7 @@ Current possibilities:
 ```
 f64 entry(i64 shift);
 
-i64 sum(i64 x, i64 y) {
+i64 sum(f64 x, f64 y) {
   return x + y;
 }
 

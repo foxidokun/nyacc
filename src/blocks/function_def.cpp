@@ -1,8 +1,15 @@
+#include "types.h"
 #include <blocks/function_def.h>
+#include <vector>
 
 void FunctionDef::codegen(CompilerContext& context) const  {
+  std::vector<ValType> argtypes;
+  for (auto &arg: args_) {
+    argtypes.emplace_back(arg.first);
+  }
+
   // Store before generation for recursion
-  context.set_func_ret(name_, rettype_);
+  context.set_function_type(name_, {rettype_, std::move(argtypes)});
 
   // Convert args to llvm type
   std::vector<llvm::Type *> llvm_args;

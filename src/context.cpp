@@ -28,16 +28,23 @@ void CompilerContext::insert_variable(const std::string& name, TypedValue val) {
   variables_.back()[name] = val;
 }
 
-
-std::optional<ValType> CompilerContext::get_func_ret(const std::string& name) const {
-  auto res_it = func_rets_.find(name);
-  if (res_it == func_rets_.end()) {
-    return std::nullopt;
+auto CompilerContext::get_function_type(const std::string& name) const -> std::shared_ptr<FuncType> {
+  auto res_it = functions_.find(name);
+  if (res_it == functions_.end()) {
+    return nullptr;
   }
 
   return res_it->second;
 }
 
-void CompilerContext::set_func_ret(const std::string& name, ValType type) {
-  func_rets_[name] = type;
+void CompilerContext::set_function_type(const std::string& name, FuncType type) {
+  functions_[name] = std::make_shared<FuncType>(std::move(type));
+}
+
+const std::string& CompilerContext::current_function() const {
+  return current_function_;
+}
+
+void CompilerContext::enter_function(std::string name) {
+  current_function_ = std::move(name);
 }

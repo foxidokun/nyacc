@@ -1,26 +1,18 @@
+#include "blocks/function_def.h"
 #include <blocks/function.h>
 
 void Function::codegen(CompilerContext& context) const  {
   context.enter_visibility_block();
-
-  // Store before generation for recursion
-  context.set_func_ret(name_, rettype_);
+  context.enter_function(name_);
 
   // Lookup function
   auto *function = context.module.getFunction(name_);
 
   if (!function) {
-    // Convert args to llvm type
-    std::vector<llvm::Type *> llvm_args;
-    for (auto& argument: args_) {
-      llvm_args.emplace_back(argument.first.llvm_type(context.llvm_context));
-    }
-
-    auto *function_type =
-        llvm::FunctionType::get(rettype_.llvm_type(context.llvm_context), llvm_args, false);
-    
-    function =
-        llvm::Function::Create(function_type, llvm::Function::ExternalLinkage, name_, context.module);
+    // Create temp definition
+    FunctionDef temporary_def(rettype_, name_, args_);
+    temporary_def.codegen(context);
+    function = context.module.getFunction(name_);
   }
   
   auto *entry_block = llvm::BasicBlock::Create(context.llvm_context, "entry", function);
