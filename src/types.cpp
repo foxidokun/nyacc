@@ -33,6 +33,7 @@ TypedValue cast(CompilerContext& context, TypedValue val, ValType target_type) {
   
   // Quickpath: nothing to do
   if (val.type == target_type) {
+    assert(val.val->getType() == target_type.llvm_type(context.llvm_context));
     return val;
   }
 

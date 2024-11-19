@@ -24,6 +24,7 @@
   #include <blocks/function.h>
   #include <blocks/function_def.h>
   #include <blocks/program.h>
+  #include <blocks/not.h>
   #include <types.h>
 }
 
@@ -61,6 +62,8 @@
 %nterm <std::unique_ptr<std::vector<std::pair<ValType, std::string>>>> args
 %nterm <std::unique_ptr<std::vector<std::unique_ptr<Expression>>>> params
 
+%left <OpSign> COMP
+%left NOT
 %left PLUS MINUS 
 %left MUL DIV
 
@@ -136,12 +139,18 @@ expression DIV expression {
 expression MUL expression {
   $$ = std::make_unique<BinopExpression>(std::move($1), std::move($3), OpSign::Mul);
 } |
+expression COMP expression {
+  $$ = std::make_unique<BinopExpression>(std::move($1), std::move($3), $2);
+} |
 LBRACE expression RBRACE {
   $$ = std::move($2);
 } |
 IDENTIFIER LBRACE params RBRACE {
   std::reverse($3->begin(), $3->end());
   $$ = std::make_unique<FuncCallExpression>(std::move($1), std::move(*$3));
+} |
+NOT expression {
+  $$ = std::make_unique<NotExpression>(std::move($2));
 }
 ;
 
