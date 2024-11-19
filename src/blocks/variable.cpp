@@ -3,13 +3,16 @@
 #include <llvm/IR/Type.h>
 
 llvm::Value *VariableExpression::codegen(CompilerContext& context) const {
-  auto res = context.get_variable(name_);
-  if (!res) {
+  auto var = context.get_variable(name_);
+  if (!var) {
     fmt::println(stderr, "Unknown variable {}", name_);
     exit(1);
   }
 
-  res = context.builder.CreateLoad(llvm::Type::getInt64Ty(context.llvm_context), res, fmt::format("loaded_{}", name_));
+  // Currently all variables are local => alloca-ted
+  // Probably need to change this for global const strings
+  auto alloca_inst = static_cast<llvm::AllocaInst *>(var);
+  var = context.builder.CreateLoad(alloca_inst->getAllocatedType(), var, fmt::format("loaded_{}", name_));
 
-  return res;
+  return var;
 }
