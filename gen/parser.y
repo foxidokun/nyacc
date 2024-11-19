@@ -34,7 +34,8 @@
 
 %token LBRACE RBRACE LCURVBRACE RCURVBRACE SEMILICON COMMA ASSIGN RETURN
 %token <std::string> IDENTIFIER
-%token <int> INTEGER
+%token <int64_t> INTEGER
+%token <double> DOUBLE
 %token <ValType> TYPE
 
 %nterm <std::unique_ptr<Statement>> statement
@@ -62,7 +63,7 @@ program: functions {
 func_impl: TYPE IDENTIFIER LBRACE RBRACE LCURVBRACE statements RCURVBRACE {
   // Because they are added in reverse order
   std::reverse($6->begin(), $6->end());
-  $$ = std::make_unique<Function>(std::move($2), std::move(*$6));
+  $$ = std::make_unique<Function>($1, std::move($2), std::move(*$6));
 };
 
 statement: TYPE IDENTIFIER ASSIGN expression SEMILICON {
@@ -94,6 +95,8 @@ LBRACE expression RBRACE {
 statements: statement statements { $2->emplace_back(std::move($1)); $$ = std::move($2); } | statement {$$ = std::make_unique<std::vector<std::unique_ptr<Statement>>>(); $$->emplace_back(std::move($1)); } ;
 functions: func_impl functions { $2->emplace_back(std::move($1)); $$ = std::move($2); } | func_impl {$$ = std::make_unique<std::vector<std::unique_ptr<Function>>>(); $$->emplace_back(std::move($1)); };
 value: INTEGER {
+  $$ = std::make_unique<ValueExpression>($1);
+} | DOUBLE {
   $$ = std::make_unique<ValueExpression>($1);
 } | IDENTIFIER {
   $$ = std::make_unique<VariableExpression>(std::move($1));

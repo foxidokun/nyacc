@@ -11,11 +11,12 @@
 
 class Function {
 public:
-  Function(std::string name, std::vector<std::unique_ptr<Statement>> content): name_(std::move(name)), content_(std::move(content)) {};
+  Function(ValType rettype, std::string name, std::vector<std::unique_ptr<Statement>> content): rettype_(rettype), name_(std::move(name)), content_(std::move(content)) {};
 
   void codegen(CompilerContext& nyacc_context) const;
 
 private:
+  ValType rettype_;
   std::string name_;
   std::vector<std::unique_ptr<Statement>> content_;
 };

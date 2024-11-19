@@ -4,7 +4,7 @@ void Function::codegen(CompilerContext& context) const  {
   context.enter_visibility_block();
 
   auto *function_type =
-      llvm::FunctionType::get(llvm::Type::getInt64Ty(context.llvm_context), std::vector<llvm::Type *>(), false);
+      llvm::FunctionType::get(rettype_.llvm_type(context.llvm_context), std::vector<llvm::Type *>(), false);
   
   auto *function =
       llvm::Function::Create(function_type, llvm::Function::ExternalLinkage, name_, context.module);
