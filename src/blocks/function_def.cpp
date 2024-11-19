@@ -1,6 +1,9 @@
 #include <blocks/function_def.h>
 
 void FunctionDef::codegen(CompilerContext& context) const  {
+  // Store before generation for recursion
+  context.set_func_ret(name_, rettype_);
+
   // Convert args to llvm type
   std::vector<llvm::Type *> llvm_args;
   for (auto& argument: args_) {

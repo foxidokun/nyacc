@@ -15,6 +15,6 @@ void LetStatement::codegen(CompilerContext &context) const {
   // Assign
   context.builder.CreateStore(casted_val.val, variable);
 
-  // Remeber
+  // Remeber after assigment
   context.insert_variable(name_, {variable, type_});
 }

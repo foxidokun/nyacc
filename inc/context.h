@@ -18,6 +18,9 @@ public:
   TypedValue get_variable(const std::string& name) const;
   void insert_variable(const std::string& name, TypedValue val);
 
+  std::optional<ValType> get_func_ret(const std::string& name) const;
+  void set_func_ret(const std::string& name, ValType type);
+
 // Storage for llvm
 public:
 llvm::LLVMContext& llvm_context;
@@ -27,4 +30,5 @@ llvm::Module& module;
 private:
   // Vector because of iterators
   std::vector<std::unordered_map<std::string, TypedValue>> variables_; 
+  std::unordered_map<std::string, ValType> func_rets_;
 };

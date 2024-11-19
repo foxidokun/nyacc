@@ -3,6 +3,9 @@
 void Function::codegen(CompilerContext& context) const  {
   context.enter_visibility_block();
 
+  // Store before generation for recursion
+  context.set_func_ret(name_, rettype_);
+
   // Lookup function
   auto *function = context.module.getFunction(name_);
 

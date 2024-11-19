@@ -12,6 +12,8 @@
   #include <blocks/assig.h>
   #include <blocks/binop.h>
   #include <blocks/expression.h>
+  #include <blocks/expr_statement.h>
+  #include <blocks/func_call.h>
   #include <blocks/return.h>
   #include <blocks/statement.h>
   #include <blocks/value.h>
@@ -51,6 +53,7 @@
 %nterm <std::unique_ptr<std::vector<std::unique_ptr<Statement>>>> functions
 %nterm <std::unique_ptr<Program>> program
 %nterm <std::unique_ptr<std::vector<std::pair<ValType, std::string>>>> args
+%nterm <std::unique_ptr<std::vector<std::unique_ptr<Expression>>>> params
 
 %left PLUS MINUS 
 %left MUL DIV
@@ -86,6 +89,9 @@ RETURN expression SEMILICON {
 } |
 IDENTIFIER ASSIGN expression SEMILICON {
   $$ = std::make_unique<AssigStatement>(std::move($1), std::move($3));
+} |
+expression SEMILICON {
+  $$ = std::make_unique<ExprStatement>(std::move($1));
 };
 
 expression: value {$$ = std::move($1);} |
@@ -103,6 +109,10 @@ expression MUL expression {
 } |
 LBRACE expression RBRACE {
   $$ = std::move($2);
+} |
+IDENTIFIER LBRACE params RBRACE {
+  std::reverse($3->begin(), $3->end());
+  $$ = std::make_unique<FuncCallExpression>(std::move($1), std::move(*$3));
 }
 ;
 
@@ -129,6 +139,16 @@ TYPE IDENTIFIER COMMA args {
   $$ = std::move($4);
 }
 | %empty { $$ = std::make_unique<std::vector<std::pair<ValType, std::string>>>(); };
+
+params: expression COMMA params {
+  $$ = std::move($3);
+  $$->push_back(std::move($1));
+} | expression {
+  $$ = std::make_unique<std::vector<std::unique_ptr<Expression>>>();
+  $$->push_back(std::move($1));
+} | %empty {
+  $$ = std::make_unique<std::vector<std::unique_ptr<Expression>>>();
+};
 
 %%
 
