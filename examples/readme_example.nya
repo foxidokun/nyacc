@@ -1,0 +1,23 @@
+str in_s();
+void println_s(str x);
+str concat(str a, str b);
+str format_i(str fmt, i64 v);
+
+str format_line(i32 idx, str line) {
+  str predicate = format_i("Idx {}: ", idx);
+  return concat(predicate, line);
+}
+
+i64 main() {
+  str hello = "Hello";
+  hello = concat(hello, " ");
+  str name = in_s();
+
+  str outw = concat(concat(hello, name), " from Cutie Development Team :3");
+
+  for (i32 i = 0; !(i >= 10); i = i - -1) {
+    println_s(format_line(i + 1, outw));
+  }
+
+  return 0;
+}
