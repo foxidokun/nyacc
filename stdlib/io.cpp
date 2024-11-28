@@ -1,9 +1,8 @@
 #include <cstdint>
 #include <cstring>
-#include <fmt/base.h>
-#include <fmt/format.h>
 #include <iostream>
 #include <string>
+#include <format>
 
 using str = const char *;
 
@@ -15,26 +14,26 @@ static str strdup(const std::string &val) {
   return storage;
 }
 
-template <typename T> static void _print(T val) { fmt::print("{}", val); }
+template <typename T> static void _print(T val) { std::cout << val; }
 
-template <typename T> static void _println(T val) { fmt::println("{}", val); }
+template <typename T> static void _println(T val) { std::cout << val << '\n'; }
 
 template <typename T> static T _in() {
-  fmt::print("Input: ");
+  std::cout << "Input: ";
   T val;
   std::cin >> val;
   return val;
 }
 
 template <> str _in<str>() {
-  fmt::print("Input: ");
+  std::cout << "Input: ";
   std::string val;
   std::getline(std::cin, val);
   return strdup(val);
 }
 
 template <typename T> str _format(str format, T val) {
-  return strdup(fmt::format(fmt::runtime(format), val));
+  return strdup(std::vformat(format,  std::make_format_args(val)));
 }
 
 // PUBLIC
@@ -71,7 +70,7 @@ CREATE_FORMAT_WRAPPER(format_i, int64_t);
 CREATE_FORMAT_WRAPPER(format_u, uint64_t);
 
 extern "C" str concat(str a, str b) {
-  return strdup(fmt::format("{}{}", a, b));
+  return strdup(std::string(a) + std::string(b));
 }
 
 extern "C" void strfree(str val) { delete val; }

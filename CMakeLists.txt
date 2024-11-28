@@ -41,4 +41,3 @@ llvm_config(nyacc USE_SHARED all)
 
 file(GLOB_RECURSE nyacclib_sources stdlib/*.cpp)
 add_library(nyacclib STATIC ${nyacclib_sources})
-target_link_libraries(nyacclib fmt::fmt)
