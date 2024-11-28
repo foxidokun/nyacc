@@ -22,19 +22,23 @@ add_definitions(${LLVM_DEFINITIONS})
 
 include(FetchContent)
 
-# FetchContent_Declare(fmt
-#   GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-#   GIT_TAG master
-# )
-# FetchContent_MakeAvailable(fmt)
+FetchContent_Declare(fmt
+  GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+  GIT_TAG master
+)
+FetchContent_MakeAvailable(fmt)
 
 file(GLOB_RECURSE nyacc_sources src/*.cpp)
 
+include_directories(${LLVM_INCLUDE_DIRS})
+separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
+add_definitions(${LLVM_DEFINITIONS_LIST})
+
 add_executable(nyacc ${nyacc_sources} ${BISON_parser_OUTPUTS} ${FLEX_lexer_OUTPUTS})
 target_include_directories(nyacc PUBLIC ${CMAKE_SOURCE_DIR}/inc)
-target_link_libraries(nyacc fmt)
-target_link_libraries(nyacc LLVM-18)
+target_link_libraries(nyacc PRIVATE fmt::fmt)
+llvm_config(nyacc USE_SHARED all)
 
 file(GLOB_RECURSE nyacclib_sources stdlib/*.cpp)
 add_library(nyacclib STATIC ${nyacclib_sources})
-target_link_libraries(nyacclib fmt)
+target_link_libraries(nyacclib fmt::fmt)
