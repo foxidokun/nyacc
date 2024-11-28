@@ -11,7 +11,7 @@
 
 static ValType get_result_type(ValType lhs, ValType rhs);
 
-#define DISPATCH_CASE(op, float_func, int_func, uint_funt, restype) \
+#define DISPATCH_BINOP(op, float_func, int_func, uint_funt, restype) \
 case OpSign::op:  \
   if (result_type.kind == ValType::Kind::Float) { \
     return {context.builder.float_func(lhs.val, rhs.val), restype}; \
@@ -37,16 +37,16 @@ TypedValue BinopExpression::codegen(CompilerContext& context) const {
   auto cmp_result_type = ValType{ValType::Kind::Int, 1};
 
   switch (type_) {
-    DISPATCH_CASE(Minus, CreateFSub, CreateSub, CreateSub, result_type)
-    DISPATCH_CASE(Plus, CreateFAdd, CreateAdd, CreateAdd, result_type)
-    DISPATCH_CASE(Mul, CreateFMul, CreateMul, CreateMul, result_type)
-    DISPATCH_CASE(Div, CreateFDiv, CreateSDiv, CreateUDiv, result_type)
-    DISPATCH_CASE(LT, CreateFCmpOLT, CreateICmpSLT, CreateICmpULT, cmp_result_type)
-    DISPATCH_CASE(LE, CreateFCmpOLE, CreateICmpSLE, CreateICmpULE, cmp_result_type)
-    DISPATCH_CASE(GT, CreateFCmpOGT, CreateICmpSGT, CreateICmpUGT, cmp_result_type)
-    DISPATCH_CASE(GE, CreateFCmpOGE, CreateICmpSGE, CreateICmpUGE, cmp_result_type)
-    DISPATCH_CASE(EQ, CreateFCmpOEQ, CreateICmpEQ, CreateICmpEQ, cmp_result_type)
-    DISPATCH_CASE(NE, CreateFCmpONE, CreateICmpNE, CreateICmpNE, cmp_result_type)
+    DISPATCH_BINOP(Minus, CreateFSub, CreateSub, CreateSub, result_type)
+    DISPATCH_BINOP(Plus, CreateFAdd, CreateAdd, CreateAdd, result_type)
+    DISPATCH_BINOP(Mul, CreateFMul, CreateMul, CreateMul, result_type)
+    DISPATCH_BINOP(Div, CreateFDiv, CreateSDiv, CreateUDiv, result_type)
+    DISPATCH_BINOP(LT, CreateFCmpOLT, CreateICmpSLT, CreateICmpULT, cmp_result_type)
+    DISPATCH_BINOP(LE, CreateFCmpOLE, CreateICmpSLE, CreateICmpULE, cmp_result_type)
+    DISPATCH_BINOP(GT, CreateFCmpOGT, CreateICmpSGT, CreateICmpUGT, cmp_result_type)
+    DISPATCH_BINOP(GE, CreateFCmpOGE, CreateICmpSGE, CreateICmpUGE, cmp_result_type)
+    DISPATCH_BINOP(EQ, CreateFCmpOEQ, CreateICmpEQ, CreateICmpEQ, cmp_result_type)
+    DISPATCH_BINOP(NE, CreateFCmpONE, CreateICmpNE, CreateICmpNE, cmp_result_type)
     default: 
     fmt::println(stderr, "Unexpected binop");
     exit(1);
