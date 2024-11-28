@@ -1,4 +1,4 @@
-#include "context.h"
+#include <context.h>
 #include <blocks/variable.h>
 #include <fmt/format.h>
 #include <llvm/IR/Type.h>
@@ -6,8 +6,7 @@
 TypedValue VariableExpression::codegen(CompilerContext& context) const {
   auto var = context.get_variable(name_);
   if (!var.val) {
-    fmt::println(stderr, "Unknown variable {}", name_);
-    exit(1);
+    throw NyaccError(fmt::format("Unknown variable {}", name_));
   }
 
   // Currently all variables are local => alloca-ted

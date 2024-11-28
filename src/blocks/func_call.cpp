@@ -1,13 +1,12 @@
 #include "types.h"
 #include <blocks/func_call.h>
-#include <fmt/base.h>
+#include <fmt/format.h>
 #include <vector>
 
 TypedValue FuncCallExpression::codegen(CompilerContext& context) const {
   auto func_type = context.get_function_type(name_);
   if (!func_type) {
-    fmt::println("Unknown func {}", name_);
-    exit(1);
+    throw NyaccError(fmt::format("Unknown func {}", name_));
   }
 
   auto func = context.module.getFunction(name_);

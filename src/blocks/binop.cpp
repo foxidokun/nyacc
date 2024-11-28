@@ -48,15 +48,13 @@ TypedValue BinopExpression::codegen(CompilerContext& context) const {
     DISPATCH_BINOP(EQ, CreateFCmpOEQ, CreateICmpEQ, CreateICmpEQ, cmp_result_type)
     DISPATCH_BINOP(NE, CreateFCmpONE, CreateICmpNE, CreateICmpNE, cmp_result_type)
     default: 
-    fmt::println(stderr, "Unexpected binop");
-    exit(1);
+    throw NyaccError("Internal error: Unexpected binop");
   }
 }
 
 static ValType get_result_type(ValType lhs, ValType rhs) {
   if (lhs.kind == ValType::Kind::Void || lhs.kind == ValType::Kind::String || rhs.kind == ValType::Kind::Void || rhs.kind == ValType::Kind::String) {
-    fmt::println(stderr, "Unsupported binop on void / string objects");
-    exit(1);
+    throw NyaccError("Unsupported binary operator on void / string objects");
   }
 
   // Both float 

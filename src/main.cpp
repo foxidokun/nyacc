@@ -28,8 +28,7 @@ std::unique_ptr<Program> get_ast(const char *filename) {
   parser();
 
   if (prog == nullptr) {
-    fmt::println(stderr, "Failed to parse");
-    exit(1);
+    throw NyaccError("Failed to parse AST");
   }
 
   return prog;
@@ -52,7 +51,9 @@ void run_optimizer(llvm::Module& module) {
   MPM.run(module,MAM);
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv) 
+try
+{
   if (argc != 3) {
     return 1;
   }
@@ -67,6 +68,7 @@ int main(int argc, char **argv) {
 
   // compile
   prog->codegen(nyacc_context);
+
   // optimize
   run_optimizer(LLVMModule);
 
@@ -74,4 +76,7 @@ int main(int argc, char **argv) {
   llvm::raw_fd_ostream out_file(argv[2], ec);
 
   LLVMModule.print(out_file, nullptr);
+} catch (NyaccError& err) {
+  fmt::println(stderr, "Compilation failed with err {}", err.what());
+  return -1;
 }

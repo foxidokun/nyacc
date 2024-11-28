@@ -1,4 +1,5 @@
 #include "blocks/common.h"
+#include "context.h"
 #include "types.h"
 #include <blocks/unary.h>
 #include <cstdlib>
@@ -20,11 +21,10 @@ TypedValue UnaryExpression::codegen(CompilerContext& context) const  {
       auto neg = context.builder.CreateNeg(val.val);
       return {neg, val.type};
     } else {
-      fmt::println(stderr, "Unsupported unary minus on void / string objects");
-      exit(1);
+      throw NyaccError("Unsupported unary minus on void / string objects");
     }
   }
 
   // Unreachable
-  exit(1);
+  throw NyaccError("Internal error: Unexpected unary operator");
 }

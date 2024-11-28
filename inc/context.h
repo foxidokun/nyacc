@@ -1,5 +1,7 @@
 #pragma once
 
+#include <exception>
+#include <stdexcept>
 #include <types.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Value.h>
@@ -38,4 +40,9 @@ private:
   std::vector<std::unordered_map<std::string, TypedValue>> variables_; 
   std::unordered_map<std::string, std::shared_ptr<FuncType>> functions_;
   std::string current_function_;
+};
+
+struct NyaccError: std::runtime_error {
+  NyaccError(const char *text): std::runtime_error(text) {}
+  NyaccError(std::string text): std::runtime_error(std::move(text)) {}
 };

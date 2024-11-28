@@ -1,11 +1,12 @@
+#include <context.h>
 #include <blocks/assig.h>
 #include <fmt/base.h>
+#include <fmt/format.h>
 
 void AssigStatement::codegen(CompilerContext &context) const {
   auto var = context.get_variable(name_);
   if (!var.val) {
-    fmt::println(stderr, "Unknown variable {}", name_);
-    exit(1);
+    throw NyaccError(fmt::format("Unknown variable {}", name_));
   }
 
   auto value = value_->codegen(context);

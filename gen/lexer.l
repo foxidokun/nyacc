@@ -66,7 +66,7 @@ float   [0-9]+\.[0-9]+
   errno = 0;
   long n = strtoll(yytext, NULL, 10);
   if (errno == ERANGE) {
-    throw yy::parser::syntax_error(std::string("integer is out of range: ") + yytext);
+    throw NyaccError(std::string("integer is out of range: ") + yytext);
   }
   return yy::parser::make_INTEGER(n);
 }
@@ -75,7 +75,7 @@ float   [0-9]+\.[0-9]+
   errno = 0;
   double n = strtod(yytext, NULL);
   if (errno == ERANGE) {
-    throw yy::parser::syntax_error(std::string("double is out of range: ") + yytext);
+    throw NyaccError(std::string("double is out of range: ") + yytext);
   }
   return yy::parser::make_DOUBLE(n);
 }
