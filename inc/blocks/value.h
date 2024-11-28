@@ -3,10 +3,10 @@
 
 class ValueExpression : public Expression {
 public:
-  ValueExpression(int64_t val): val_(val), kind_(ValType::Kind::Int) {}
-  ValueExpression(double val): val_(val), kind_(ValType::Kind::Float) {}
+  ValueExpression(int64_t val) : val_(val), kind_(ValType::Kind::Int) {}
+  ValueExpression(double val) : val_(val), kind_(ValType::Kind::Float) {}
 
-  TypedValue codegen(CompilerContext& nyacc_context) const override;
+  TypedValue codegen(CompilerContext &nyacc_context) const override;
 
 private:
   std::variant<int64_t, double> val_;

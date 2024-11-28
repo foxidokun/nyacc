@@ -1,11 +1,11 @@
-#include "blocks/common.h"
-#include "context.h"
-#include "types.h"
+#include <blocks/common.h>
 #include <blocks/unary.h>
+#include <context.h>
 #include <cstdlib>
 #include <fmt/base.h>
+#include <types.h>
 
-TypedValue UnaryExpression::codegen(CompilerContext& context) const  {
+TypedValue UnaryExpression::codegen(CompilerContext &context) const {
   if (operator_ == Op::Not) {
     auto val = boolify(context, val_->codegen(context));
     auto res = context.builder.CreateNot(val.val);
@@ -17,7 +17,8 @@ TypedValue UnaryExpression::codegen(CompilerContext& context) const  {
     if (val.type.kind == ValType::Kind::Float) {
       auto neg = context.builder.CreateFNeg(val.val);
       return {neg, val.type};
-    } else if (val.type.kind == ValType::Kind::Int || val.type.kind == ValType::Kind::UInt) {
+    } else if (val.type.kind == ValType::Kind::Int ||
+               val.type.kind == ValType::Kind::UInt) {
       auto neg = context.builder.CreateNeg(val.val);
       return {neg, val.type};
     } else {

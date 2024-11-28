@@ -8,7 +8,7 @@
 #undef YY_DECL
 #define YY_DECL yy::parser::symbol_type CustLexer::get_next_token()
 
-class CustLexer: public yyFlexLexer {
+class CustLexer : public yyFlexLexer {
 public:
   CustLexer() = default;
 

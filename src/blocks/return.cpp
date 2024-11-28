@@ -1,7 +1,7 @@
-#include "types.h"
 #include <blocks/return.h>
+#include <types.h>
 
-void ReturnStatement::codegen(CompilerContext& context) const {
+void ReturnStatement::codegen(CompilerContext &context) const {
   auto func_type = context.get_function_type(context.current_function());
   if (value_) {
     auto retval = value_->codegen(context);

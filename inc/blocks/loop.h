@@ -14,7 +14,7 @@ public:
                 std::vector<std::unique_ptr<Statement>> content)
       : start_(std::move(start)), step_(std::move(step)),
         condition_(std::move(condition)), content_(std::move(content)) {};
-  
+
   virtual void codegen(CompilerContext &nyacc_context) const override;
 
 private:

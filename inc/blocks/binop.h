@@ -1,12 +1,14 @@
-#include <blocks/expression.h>
 #include <blocks/common.h>
+#include <blocks/expression.h>
 #include <memory>
 
 class BinopExpression : public Expression {
 public:
-  BinopExpression(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs, OpSign type) : lhs_(std::move(lhs)), rhs_(std::move(rhs)), type_(type) {}
+  BinopExpression(std::unique_ptr<Expression> lhs,
+                  std::unique_ptr<Expression> rhs, OpSign type)
+      : lhs_(std::move(lhs)), rhs_(std::move(rhs)), type_(type) {}
 
-  TypedValue codegen(CompilerContext& nyacc_context) const override;
+  TypedValue codegen(CompilerContext &nyacc_context) const override;
 
 private:
   std::unique_ptr<Expression> lhs_;

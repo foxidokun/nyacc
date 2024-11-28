@@ -1,16 +1,16 @@
-#include <context.h>
 #include <CustLexer.h>
+#include <context.h>
 #include <fcntl.h>
 #include <fmt/base.h>
 #include <fmt/printf.h>
 #include <fstream>
-#include <llvm/Support/raw_ostream.h>
-#include <parser.gen.h>
+#include <llvm/Analysis/CGSCCPassManager.h>
+#include <llvm/Analysis/LoopAnalysisManager.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/PassManager.h>
 #include <llvm/Passes/PassBuilder.h>
-#include <llvm/Analysis/LoopAnalysisManager.h>
-#include <llvm/Analysis/CGSCCPassManager.h>
+#include <llvm/Support/raw_ostream.h>
+#include <parser.gen.h>
 
 #include <blocks/program.h>
 #include <sstream>
@@ -34,7 +34,7 @@ std::unique_ptr<Program> get_ast(const char *filename) {
   return prog;
 }
 
-void run_optimizer(llvm::Module& module) {
+void run_optimizer(llvm::Module &module) {
   llvm::LoopAnalysisManager LAM;
   llvm::FunctionAnalysisManager FAM;
   llvm::CGSCCAnalysisManager CGAM;
@@ -47,13 +47,12 @@ void run_optimizer(llvm::Module& module) {
   PB.registerLoopAnalyses(LAM);
   PB.crossRegisterProxies(LAM, FAM, CGAM, MAM);
 
-  llvm::ModulePassManager MPM = PB.buildPerModuleDefaultPipeline(llvm::OptimizationLevel::O2);
-  MPM.run(module,MAM);
+  llvm::ModulePassManager MPM =
+      PB.buildPerModuleDefaultPipeline(llvm::OptimizationLevel::O2);
+  MPM.run(module, MAM);
 }
 
-int main(int argc, char **argv) 
-try
-{
+int main(int argc, char **argv) try {
   if (argc != 3) {
     return 1;
   }
@@ -76,7 +75,7 @@ try
   llvm::raw_fd_ostream out_file(argv[2], ec);
 
   LLVMModule.print(out_file, nullptr);
-} catch (NyaccError& err) {
+} catch (NyaccError &err) {
   fmt::println(stderr, "Compilation failed with err {}", err.what());
   return -1;
 }

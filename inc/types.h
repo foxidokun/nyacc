@@ -9,21 +9,15 @@
 class CompilerContext;
 
 struct ValType {
-  enum class Kind: uint8_t {
-    Int,
-    UInt,
-    Float,
-    Void,
-    String
-  };
+  enum class Kind : uint8_t { Int, UInt, Float, Void, String };
 
   Kind kind;
   uint8_t bitwidth;
 
-  bool operator==(const ValType&) const = default;
+  bool operator==(const ValType &) const = default;
 
   // Helpful methods
-  llvm::Type *llvm_type(llvm::LLVMContext&) const;
+  llvm::Type *llvm_type(llvm::LLVMContext &) const;
 };
 
 struct TypedValue {
@@ -31,4 +25,4 @@ struct TypedValue {
   ValType type;
 };
 
-TypedValue cast(CompilerContext& context, TypedValue val, ValType target_type);
+TypedValue cast(CompilerContext &context, TypedValue val, ValType target_type);

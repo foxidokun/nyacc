@@ -3,14 +3,12 @@
 
 class UnaryExpression : public Expression {
 public:
-  enum class Op {
-    Not,
-    Minus
-  };
+  enum class Op { Not, Minus };
 
-  UnaryExpression(std::unique_ptr<Expression> val, Op oper): val_(std::move(val)), operator_(oper) {}
+  UnaryExpression(std::unique_ptr<Expression> val, Op oper)
+      : val_(std::move(val)), operator_(oper) {}
 
-  TypedValue codegen(CompilerContext& nyacc_context) const override;
+  TypedValue codegen(CompilerContext &nyacc_context) const override;
 
 private:
   Op operator_;
