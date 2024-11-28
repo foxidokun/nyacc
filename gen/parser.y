@@ -24,7 +24,7 @@
   #include <blocks/function.h>
   #include <blocks/function_def.h>
   #include <blocks/program.h>
-  #include <blocks/not.h>
+  #include <blocks/unary.h>
   #include <types.h>
 }
 
@@ -66,6 +66,7 @@
 %left NOT
 %left PLUS MINUS 
 %left MUL DIV
+%left UMINUS
 
 %start program
 
@@ -150,7 +151,10 @@ IDENTIFIER LBRACE params RBRACE {
   $$ = std::make_unique<FuncCallExpression>(std::move($1), std::move(*$3));
 } |
 NOT expression {
-  $$ = std::make_unique<NotExpression>(std::move($2));
+  $$ = std::make_unique<UnaryExpression>(std::move($2), UnaryExpression::Op::Not);
+} |
+MINUS expression %prec UMINUS {
+  $$ = std::make_unique<UnaryExpression>(std::move($2), UnaryExpression::Op::Minus);
 }
 ;
 
