@@ -25,7 +25,7 @@ cd ..
 
 ### Using docker
 ```
-docker build , -t nyacc_compiler
+docker build . -t nyacc_compiler
 docker run -it --mount src="$(pwd)",target=/pwd_dir,type=bind nyacc_compiler:latest
 ```
 Now, compile any example with wrapper or manual compilation
